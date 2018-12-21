@@ -11,5 +11,5 @@ import co.edu.itli.campus.core.model.Rol;
  */
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Long> {
-    Optional<Rol> findByName(String rolName);
+    Optional<Rol> findByNombre(String nombre);
 }

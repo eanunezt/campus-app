@@ -88,7 +88,7 @@ public class UserAdminResource {
 
       user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-      Rol userRole = roleRepository.findByName("ROL_INVITADO")
+      Rol userRole = roleRepository.findByNombre("ROL_INVITADO")
               .orElseThrow(() -> new AppException("User Role not set."));
 
       user.setRoles(Collections.singleton(userRole));
