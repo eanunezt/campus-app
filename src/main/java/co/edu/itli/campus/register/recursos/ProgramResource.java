@@ -36,9 +36,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/api/v1/programs")
-@Api(tags = "/api/v1/programs")
-@PreAuthorize("hasRole('A2')")
+@RequestMapping("/api/v1/programas")
+@Api(tags = "/api/v1/programas")
 public class ProgramResource {
 	
 	  @Autowired
@@ -46,7 +45,7 @@ public class ProgramResource {
 	 
 	  		@SuppressWarnings({ "rawtypes", "unchecked" })
 	  		@RequestMapping(method = RequestMethod.POST)
-	  		//@PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  		@PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  		@ApiOperation(value = "Create Program")
 	  		@ApiResponses(value = {//
 	        @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -74,7 +73,7 @@ public class ProgramResource {
 	    }
 	  		
 	  		  @DeleteMapping(value = "/{id}")
-	  		  //@PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  		  @PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  		  @ApiOperation(value = "Delete Program")
 	  		  @ApiResponses(value = {//
 	  		      @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -91,6 +90,7 @@ public class ProgramResource {
 
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	  	    @ApiOperation(value = "Find by Id Program")
+	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  	    @ApiResponses(value = {//
 	  	    @ApiResponse(code = 400, message = "Something went wrong"), //
 	  		@ApiResponse(code = 403, message = "Access denied"), //
@@ -106,6 +106,7 @@ public class ProgramResource {
 	  	    // read - all
 
 	  	    @RequestMapping(method = RequestMethod.GET)
+	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Programs")
 	  	    @ApiResponses(value = {//
@@ -118,20 +119,20 @@ public class ProgramResource {
 	  	    }
 	  	    
 	  	    
-	  	    @GetMapping("/catalog")
+	  	    @GetMapping("/catalogo")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Return all Catalog of Actives Programs")
 	  	    @ApiResponses(value = {//
 	  	    @ApiResponse(code = 400, message = "Something went wrong"), //
 	  		@ApiResponse(code = 403, message = "Access denied"), //
-	  		@ApiResponse(code = 401, message = "Unauthorized"),
-	  		@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+	  		@ApiResponse(code = 401, message = "Unauthorized")})
 	  	    public List<CatalogoDTO> getCatalog() {
 	  	        return programService.getCatalog();
 	  	    }
 
 	  	    @RequestMapping(params = { "page", "size" }, method = RequestMethod.GET)
 	  	    @ResponseBody
+	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  	    @ApiOperation(value = "Return all Programs (Paginated)")
 	  	    @ApiResponses(value = {//
 	  	    @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -148,6 +149,7 @@ public class ProgramResource {
 	  	    }
 	  	    
 	  	    @GetMapping("/pageable")
+	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Programs (Paginated)")
 	  	    @ApiResponses(value = {//
@@ -167,7 +169,7 @@ public class ProgramResource {
 	  	    // write
 
 	  	  
-
+	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	  	    @ResponseStatus(HttpStatus.OK)
 	  	    @ApiOperation(value = "Update Programs Paginated")

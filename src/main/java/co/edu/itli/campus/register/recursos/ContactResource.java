@@ -35,9 +35,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/api/v1/contacts")
-@Api(tags = "/api/v1/contacts")
-@PreAuthorize("hasRole('A2')")
+@RequestMapping("/api/v1/contactos")
+@Api(tags = "/api/v1/contactos")
 public class ContactResource {
 	
 	  @Autowired
@@ -63,14 +62,14 @@ public class ContactResource {
 	        Contacto contact = contactService.create(contactRequest);
 
 	        URI location = ServletUriComponentsBuilder
-	                .fromCurrentContextPath().path("/api/v1/contacts")
+	                .fromCurrentContextPath().path("/api/v1/contactos")
 	                .buildAndExpand(contact.getId()).toUri();
 
-	        return ResponseEntity.created(location).body(new ApiResponseDTO(true, "Contact registered successfully"));
+	        return ResponseEntity.created(location).body(new ApiResponseDTO(true, "Contacto registrado correctamente."));
 	    }
 	  		
 	  		  @DeleteMapping(value = "/{id}")
-	  		  //@PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  		  @PreAuthorize("hasRole('R1')")
 	  		  @ApiOperation(value = "Delete Contact")
 	  		  @ApiResponses(value = {//
 	  		      @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -84,7 +83,7 @@ public class ContactResource {
 	  		  }
 	  
 	  		// read - one
-
+	  		@PreAuthorize("hasRole('R1')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	  	    @ApiOperation(value = "Find by Id Contact")
 	  	    @ApiResponses(value = {//
@@ -101,7 +100,7 @@ public class ContactResource {
 
 	  	    // read - all
 
-	  	   
+	  		@PreAuthorize("hasRole('R1')")
 	  	    @GetMapping("/all")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts")
@@ -113,7 +112,8 @@ public class ContactResource {
 	  	    public List<Contacto> findAll() {
 	  	        return contactService.findAll();
 	  	    }
-
+	  		
+	  		@PreAuthorize("hasRole('R1')")
 	  	    @RequestMapping(params = { "page", "size" }, method = RequestMethod.GET)
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts Paginated")
@@ -130,7 +130,8 @@ public class ContactResource {
 	  	        
 	  	        return resultPage.getContent();
 	  	    }
-	  	    
+	  		
+	  		@PreAuthorize("hasRole('R1')")
 	  	    @GetMapping("/pageable")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts Paginated")
@@ -151,7 +152,7 @@ public class ContactResource {
 	  	    // write
 
 	  	  
-
+	  		@PreAuthorize("hasRole('R1')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	  	    @ResponseStatus(HttpStatus.OK)
 	  	    @ApiOperation(value = "Update Contacts Paginated")

@@ -91,7 +91,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                         .permitAll()
-                    .antMatchers("/api/auth/**")
+                        .antMatchers("/api/auth/**")
+                        .permitAll()
+                        .antMatchers("/api/**/programas/catalogo/**")
                         .permitAll()
                         .antMatchers("/users/signin").permitAll()//
                         .antMatchers("/users/signup").permitAll()//
@@ -119,9 +121,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
           .antMatchers("/error")
           
           // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-          .and()
-          .ignoring()
-          .antMatchers("/h2-console/**/**");
+          //.and()
+          //.ignoring()
+          //.antMatchers("/h2-console/**/**")
+          ;
       
     
     }
