@@ -95,6 +95,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .permitAll()
                         .antMatchers("/api/**/programas/catalogo/**")
                         .permitAll()
+                        .antMatchers("/api/**/contactos/**")
+                        .permitAll()
                         .antMatchers("/users/signin").permitAll()//
                         .antMatchers("/users/signup").permitAll()//
                     .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
