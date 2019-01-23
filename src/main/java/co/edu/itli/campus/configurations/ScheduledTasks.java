@@ -19,7 +19,6 @@ public class ScheduledTasks {
     public void reportCurrentTime() {
     	RestTemplate restTemplate = new RestTemplate();
         String quote = restTemplate.getForObject("https://campus-itli.herokuapp.com/users/online", String.class);
-        log.info(quote);
         log.info(""+quote+" The time is now {}", dateFormat.format(new Date()));
     }
 }

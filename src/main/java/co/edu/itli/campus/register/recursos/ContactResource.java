@@ -65,7 +65,7 @@ public class ContactResource {
 	                .fromCurrentContextPath().path("/api/v1/contactos")
 	                .buildAndExpand(contact.getId()).toUri();
 
-	        return ResponseEntity.created(location).body(new ApiResponseDTO(true, "Contacto registrado correctamente."));
+	        return ResponseEntity.created(location).body(new ApiResponseDTO(true, "Contacto registrado correctamente, pronto te contactamos, gracias."));
 	    }
 	  		
 	  		  @DeleteMapping(value = "/{id}")
@@ -194,7 +194,7 @@ public class ContactResource {
 	 	        }
 	 	        else if(contactRequest.getId()==null && contactRequest.getEmail()!=null && contactService.existEmail(contactRequest.getEmail())) {
 	 	        	
-	 	            return new ResponseEntity<ApiResponseDTO>(new ApiResponseDTO(false, "Email existe"),
+	 	            return new ResponseEntity<ApiResponseDTO>(new ApiResponseDTO(false, "Email ya existe, pronto te contactamos, gracias."),
 	 	                    HttpStatus.UNPROCESSABLE_ENTITY);
 	 	        }
 				return null; 
