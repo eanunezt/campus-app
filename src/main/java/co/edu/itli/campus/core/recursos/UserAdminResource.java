@@ -139,5 +139,10 @@ public class UserAdminResource {
 	  req.isUserInRole("R1");
     return modelMapper.map(userService.whoami(req), UserResponseDTO.class);
   }
+  
+  @GetMapping(value = "/online")    
+  public String online(HttpServletRequest req) {	  
+    return "online";
+  }
 
 }

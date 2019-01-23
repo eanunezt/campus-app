@@ -12,8 +12,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import co.edu.itli.campus.configurations.DefaultRolesPrefixPostProcessor;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class CampusApplication {
  
     private static final Logger LOG = LoggerFactory.getLogger(CampusApplication.class);
