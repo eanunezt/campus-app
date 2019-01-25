@@ -38,7 +38,9 @@ public class ContactService extends AbstractService<Contacto> implements IContac
 	}
 	
 	@Override
-	public Contacto create(Contacto entity) {		
+	public Contacto create(Contacto entity) {	
+		entity.setEmail(entity.getEmail().toLowerCase());
+		entity.setNombre(entity.getNombre().toUpperCase());
 		return save(entity);
 	}
 	

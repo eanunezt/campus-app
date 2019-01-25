@@ -10,6 +10,6 @@ import co.edu.itli.campus.register.model.Contacto;
 public interface IContactoService<T extends Serializable> extends ICommonsOperations<T> {
      
     Contacto findByEmail(String email);
-    @Query(value="select count(id) from Contact where email=:email" )
+    @Query(value="select count(id) from Contact where UPPPER(email)=UPPER(:email)" )
     boolean existEmail(@Param("email") String email);
 }
