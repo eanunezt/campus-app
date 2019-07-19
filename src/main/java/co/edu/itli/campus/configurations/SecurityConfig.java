@@ -70,8 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                /*.cors()
-                    .and()*/
+                .cors()
+                    .and()
                 .csrf()
                     .disable()
                 .exceptionHandling()
@@ -91,16 +91,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                         .permitAll()
-                        .antMatchers("/api/auth/**")
-                        .permitAll()
-                        .antMatchers("/users/online")
-                        .permitAll()
-                        .antMatchers("/api/**/programas/catalogo/**")
-                        .permitAll()
-                        .antMatchers("/api/**/contactos/**")
-                        .permitAll()
-                        .antMatchers("/users/signin").permitAll()//
-                        .antMatchers("/users/signup")
+                        .antMatchers("/api/auth/**").permitAll()
+                        .antMatchers("/api/users/online").permitAll()
+                        .antMatchers("/api/**/programas/catalogo/**").permitAll()
+                        .antMatchers("/api/**/contactos/**").permitAll()
+                        .antMatchers("/api/users/signin").permitAll()//
+                        .antMatchers("/api/users/signup")
                         //.permitAll()//.antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
                         .permitAll()
                     //.antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**").permitAll()

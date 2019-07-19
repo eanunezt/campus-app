@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import co.edu.itli.campus.core.dtos.ApiResponseDTO;
+import co.edu.itli.campus.core.dtos.ProfileTO;
 import co.edu.itli.campus.core.dtos.UserDataDTO;
 import co.edu.itli.campus.core.dtos.UserResponseDTO;
 import co.edu.itli.campus.core.model.Rol;
@@ -38,8 +41,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @Api(tags = "users")
+//@CrossOrigin(origins = "*")//TODO
 public class UserAdminResource {
 
   @Autowired
@@ -116,29 +120,42 @@ public class UserAdminResource {
   }
 
   @GetMapping(value = "/{username}")
-  @PreAuthorize("hasRole('R1')")
+  @PreAuthorize("hasRole('R1')") //TODO
   @ApiOperation(value = "${UserController.search}", response = UserResponseDTO.class)
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 404, message = "The user doesn't exist"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-  public UserResponseDTO search(@ApiParam("Username") @PathVariable String username) {
+  public UserResponseDTO search(@ApiParam("Username") @PathVariable String username, @RequestHeader HttpHeaders headers) {
     return modelMapper.map(userService.findByUsername(username), UserResponseDTO.class);
   }
 
   @GetMapping(value = "/me")
-  @PreAuthorize("hasRole('R1') or hasRole('R2')")
+  @PreAuthorize("hasRole('R1')")
   @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class)
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-  public UserResponseDTO whoami(HttpServletRequest req) {
-	  
+  public UserResponseDTO whoami(HttpServletRequest req) {	  
 	  req.isUserInRole("R1");
     return modelMapper.map(userService.whoami(req), UserResponseDTO.class);
   }
+  //userService.getProfileUser(username);
+  
+  @GetMapping(value = "/profile/{username}")
+  @PreAuthorize("hasRole('R2') or hasRole('R1')") //TODO
+  @ApiOperation(value = "${UserController.getProfileUser}", response = UserResponseDTO.class)
+  @ApiResponses(value = {//
+      @ApiResponse(code = 400, message = "Something went wrong"), //
+      @ApiResponse(code = 403, message = "Access denied"), //
+      @ApiResponse(code = 404, message = "The user doesn't exist"), //
+      @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+  public ProfileTO getProfileUser(@ApiParam("Username") @PathVariable String username) {
+    return userService.getProfileUser(username);
+  }
+  
   
   @GetMapping(value = "/online")    
   public String online(HttpServletRequest req) {	  

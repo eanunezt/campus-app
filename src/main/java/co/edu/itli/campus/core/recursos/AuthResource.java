@@ -2,7 +2,6 @@ package co.edu.itli.campus.core.recursos;
 
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,27 +11,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import co.edu.itli.campus.core.dtos.ApiResponseDTO;
 import co.edu.itli.campus.core.dtos.JwtAuthenticationResponseDTO;
 import co.edu.itli.campus.core.dtos.RolDTO;
+import co.edu.itli.campus.core.dtos.SignInTO;
 import co.edu.itli.campus.core.dtos.UserDataDTO;
 import co.edu.itli.campus.core.model.Rol;
 import co.edu.itli.campus.core.model.Usuario;
 import co.edu.itli.campus.core.respositorios.RolRepository;
 import co.edu.itli.campus.core.respositorios.UserRepository;
 import co.edu.itli.campus.core.seguridad.JwtTokenProvider;
-import co.edu.itli.campus.exception.AppException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -63,25 +64,32 @@ public class AuthResource {
     JwtTokenProvider tokenProvider;
     
     @PostMapping("/signin")
-    @ApiOperation(value = "${UserController.signin}")
+    @ApiOperation(value = "${UserController.signin}")   
     @ApiResponses(value = {//
         @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 422, message = "Invalid username/password supplied")})
+        @ApiResponse(code = 422, message = "Invalid username/password supplied"),
+        @ApiResponse(code = 401, message = "Invalid username/password supplied")})
     public ResponseEntity<JwtAuthenticationResponseDTO> login(//
-        @ApiParam("Username") @RequestParam String username, //
-        @ApiParam("Password") @RequestParam String password) {
+    		@Valid  @ApiParam("SignIn") @RequestBody SignInTO signin) {
   	  
+    	try {
   	  Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        username,
-                        password
+                		signin.getUsername(),
+                		signin.getPassword()
                 )
         );
+  	  SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+      String jwt = tokenProvider.generateToken(authentication);
+      return ResponseEntity.ok(new JwtAuthenticationResponseDTO(jwt));
+    	}catch(AuthenticationException e) {
+    		
+    		throw new BadCredentialsException("Usuario o Password Incorrectos.");
+    		
+    	}
 
-        String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponseDTO(jwt));
+      
     }
     
     

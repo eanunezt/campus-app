@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import co.edu.itli.campus.core.dtos.ProfileTO;
 import co.edu.itli.campus.core.model.Autorizacion;
 import co.edu.itli.campus.core.model.Rol;
 import co.edu.itli.campus.core.model.RolAutorizacion;
@@ -99,8 +100,50 @@ private UserPrincipal create(Usuario user) {
         );
     }
 
+
+
 public Usuario findByUsername(String username) {
     return userRepository.findByUsuario(username).orElseThrow(() -> new AppException("User not found."));
+  }
+
+public ProfileTO getProfileUser(String username) {
+	
+	Usuario user=userRepository.findByUsuario(username).orElseThrow(() -> new AppException("User not found."));
+	
+	
+	Set<Rol> roles=user.getRoles();
+	Map<String,String> authoritiesMap=new HashMap<String,String>();
+	
+	for (Iterator<?> iterator = roles.iterator(); iterator.hasNext();) {
+		Rol rol = (Rol) iterator.next();
+		
+		if(rol.getAutorizaciones()!=null) {
+			Iterator<RolAutorizacion> iteratorAUTH = rol.getAutorizaciones().iterator();
+			while (iteratorAUTH.hasNext()) {
+				Autorizacion object = (Autorizacion) iteratorAUTH.next().getAutorizacion();
+				authoritiesMap.put(""+object.getId(), "A"+object.getId());
+			}
+			
+		}
+		
+	}
+	
+    List<String> authorities = user.getRoles().stream().map(role ->                
+    "R"+role.getId()
+    ).collect(Collectors.toList());
+    
+    authorities.addAll(authoritiesMap.values());
+	
+	//String iD, String username, String name, String email, List<String> roles
+	ProfileTO ret=new ProfileTO(
+			user.getId().toString(),
+			user.getUsername(),
+			user.getNombre(),
+			user.getEmail(),
+			authorities
+			);
+	
+    return ret;
   }
 
 public Usuario whoami(HttpServletRequest req) {

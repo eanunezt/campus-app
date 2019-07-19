@@ -1,12 +1,20 @@
 package co.edu.itli.campus.register.services.jpa;
 
-import java.time.Instant;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.edu.itli.campus.core.services.AbstractService;
 import co.edu.itli.campus.register.model.Contacto;
@@ -59,7 +67,7 @@ public class ContactService extends AbstractService<Contacto> implements IContac
 	     if(entity.getProgramas()!=null && !entity.getProgramas().isEmpty()){
 	    	 
 	    	 if(isNew) {
-	    		 _contact=contactRepository.save(entity);
+	    		 _contact=create(entity);
 		    	}else {
 		    		
 		    		contProgRepositoy.deleteContactProgramByIdContacto(entity.getId());
@@ -70,7 +78,7 @@ public class ContactService extends AbstractService<Contacto> implements IContac
 	    		if(isNew) {
 	    		contPrg.setIdContacto(_contact.getId()); }
 	    		
-	    		contPrg.setFecCambio(Instant.now());
+	    		contPrg.setFecCambio(LocalDateTime.now());
 	    		 contProgRepositoy.insert(contPrg.getFecCambio(),contPrg.getIdContacto(),contPrg.getIdPrograma());
 			}
 	    	 if(!isNew) {
@@ -94,8 +102,39 @@ public class ContactService extends AbstractService<Contacto> implements IContac
 		// TODO Auto-generated method stub
 		return contactRepository.existEmail(email);
 	}
+
+	@Override
+	public Page<Contacto> contactoFilter(final String filter,final int page, final int size) {
+		
+		if(filter!=null) {
+			
+			ObjectMapper objectMapper = new ObjectMapper();
+				JsonNode jsonNode;
+				String numTelefonoNombre=null;
+				try {
+					jsonNode = objectMapper.readTree(filter);
+					numTelefonoNombre = jsonNode.get("numTelefonoNombre").asText();
+				} catch (IOException e) {					
+					e.printStackTrace();
+				}
+				
+			
+			if(numTelefonoNombre!=null && !"".equals(numTelefonoNombre))
+			return contactRepository.findAll(_nombreContains(numTelefonoNombre),PageRequest.of(page, size));	
+		}
+			return contactRepository.findAll(PageRequest.of(page, size));
+    }
 	
-	
+	static Specification<Contacto> _nombreContains(String filter) {
+	    return (contacto, cq, cb) -> 
+	    		cb.like(
+	    				cb.upper(
+	    						cb.concat(
+	    								cb.concat(contacto.get("numTelefono"), " "),
+	    								contacto.get("nombre"))
+	    						), "%" + filter.toUpperCase() + "%"
+	    		);
+	}
 	
 	
 }

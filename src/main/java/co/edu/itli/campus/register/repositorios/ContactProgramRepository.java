@@ -1,6 +1,6 @@
 package co.edu.itli.campus.register.repositorios;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,5 +20,5 @@ public interface ContactProgramRepository extends JpaRepository<ContactoPrograma
 	 @Modifying
 	@Query(value="insert into contacto_programas (fec_cambio, id_contacto, id_programa) values (:fec_cambio, :id_contacto, :id_programa)",nativeQuery=true )
 	 @Transactional
-	void insert(@Param("fec_cambio") Instant fec_cambio,@Param("id_contacto") Long id_contacto,@Param("id_programa") Long id_programa);
+	void insert(@Param("fec_cambio") LocalDateTime fec_cambio,@Param("id_contacto") Long id_contacto,@Param("id_programa") Long id_programa);
 }

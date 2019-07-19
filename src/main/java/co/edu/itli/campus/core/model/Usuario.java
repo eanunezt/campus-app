@@ -28,7 +28,12 @@ public class Usuario extends EntidadAuditada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(position = 0)
+    @Column(length = 32)
+    //@GeneratedValue(generator = "system-uuid")
+    //@GenericGenerator(name = "system-uuid", strategy = "uuid")
+    //String id;
     private Long id;
+
 
     @NotBlank
     @Size(max = 40)
@@ -117,6 +122,10 @@ public class Usuario extends EntidadAuditada {
 	}
 
 	public String getUsuario() {
+		return usuario;
+	}
+	@Transient
+	public String getUsername() {
 		return usuario;
 	}
 
