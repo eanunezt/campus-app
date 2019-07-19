@@ -86,7 +86,7 @@ public class ContactResource {
 	  		  }
 	  
 	  		// read - one
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	  	    @ApiOperation(value = "Find by Id Contact")
 	  	    @ApiResponses(value = {//
@@ -118,7 +118,7 @@ public class ContactResource {
 	  		
 	  		
 	  		
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @RequestMapping(value="/", method = RequestMethod.GET)
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts Paginated")
@@ -147,7 +147,7 @@ public class ContactResource {
 	  	       
 	  	    }
 	  		
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @GetMapping("/pageable")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts Paginated")
@@ -168,7 +168,7 @@ public class ContactResource {
 	  	    // write
 
 	  	  
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	  	    @ResponseStatus(HttpStatus.OK)
 	  	    @ApiOperation(value = "Update Contacts Paginated")

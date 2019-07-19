@@ -145,7 +145,7 @@ public class UserAdminResource {
   //userService.getProfileUser(username);
   
   @GetMapping(value = "/profile/{username}")
-  @PreAuthorize("hasRole('R2') or hasRole('R1')") //TODO
+  @PreAuthorize("hasRole('R1')") //TODO
   @ApiOperation(value = "${UserController.getProfileUser}", response = UserResponseDTO.class)
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
