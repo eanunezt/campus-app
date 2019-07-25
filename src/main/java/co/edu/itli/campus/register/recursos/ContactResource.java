@@ -1,6 +1,7 @@
 package co.edu.itli.campus.register.recursos;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
 import co.edu.itli.campus.core.dtos.ApiResponseDTO;
@@ -43,7 +46,7 @@ public class ContactResource {
 	  private IContactoService<Contacto> contactService;
 	 
 	  		@SuppressWarnings({ "rawtypes", "unchecked" })
-	  		@RequestMapping(method = RequestMethod.POST)
+	  		@RequestMapping(method = RequestMethod.POST)	  		
 	  		//@PreAuthorize("hasRole('R1') or hasRole('A2')")
 	  		@ApiOperation(value = "Create Contact")
 	  		@ApiResponses(value = {//
@@ -83,7 +86,7 @@ public class ContactResource {
 	  		  }
 	  
 	  		// read - one
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	  	    @ApiOperation(value = "Find by Id Contact")
 	  	    @ApiResponses(value = {//
@@ -100,8 +103,8 @@ public class ContactResource {
 
 	  	    // read - all
 
-	  		@PreAuthorize("hasRole('R1')")
-	  	    @GetMapping("/all")
+	  		/*@PreAuthorize("hasRole('R1')")
+	  	    @GetMapping("/")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts")
 	  	    @ApiResponses(value = {//
@@ -111,27 +114,40 @@ public class ContactResource {
 	  		@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
 	  	    public List<Contacto> findAll() {
 	  	        return contactService.findAll();
-	  	    }
+	  	    }*/
 	  		
-	  		@PreAuthorize("hasRole('R1')")
-	  	    @RequestMapping(params = { "page", "size" }, method = RequestMethod.GET)
+	  		
+	  		
+	  		@PreAuthorize("hasRole('R100')")
+	  	    @RequestMapping(value="/", method = RequestMethod.GET)
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts Paginated")
 	  	    @ApiResponses(value = {//
 	  	    @ApiResponse(code = 400, message = "Something went wrong"), //
 	  		@ApiResponse(code = 403, message = "Access denied"), //
 	  		@ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-	  	    public List<Contacto> findPaginated(@ApiParam("page and size") @RequestParam("page") @PathVariable final int page, 
-	  	    		@RequestParam("size")  @PathVariable final int size) {
-	  	        final Page<Contacto> resultPage = contactService.findPaginated(page, size);
-	  	        if (page > resultPage.getTotalPages()) {
-	  	            throw new ResourceNotFoundException("Contacts not found");
-	  	        }
+	  	    public Page<Contacto> findPaginated(
+	  	    		@ApiParam("{ pagination: { page: {int} , perPage: {int} }, sort: { field: {string}, order: {string} }, filter: {Object} }") 
+	  	    		@RequestParam Map<String, String> customQuery) {
+	  			
+	  			if(customQuery.containsKey("page") && customQuery.containsKey("pageSize")) {
+	  				int page=Integer.valueOf(customQuery.get("page"));
+	  				int pageSize=Integer.valueOf(customQuery.get("pageSize"));
+	  				String json=customQuery.get("filter");	  				
+	  				final Page<Contacto> resultPage = contactService.contactoFilter(json, page, pageSize);
+		  	        if (page > resultPage.getTotalPages()) {
+		  	            throw new ResourceNotFoundException("Contacts not found");
+		  	        }
+		  	        
+		  	      return resultPage;
+	  			}
+	  			return contactService.findPaginated(0, 100); 	  	        
+	  	      //ResponseEntity<List<Contacto>>
 	  	        
-	  	        return resultPage.getContent();
+	  	       
 	  	    }
 	  		
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @GetMapping("/pageable")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Contacts Paginated")
@@ -152,7 +168,7 @@ public class ContactResource {
 	  	    // write
 
 	  	  
-	  		@PreAuthorize("hasRole('R1')")
+	  		@PreAuthorize("hasRole('R100')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	  	    @ResponseStatus(HttpStatus.OK)
 	  	    @ApiOperation(value = "Update Contacts Paginated")

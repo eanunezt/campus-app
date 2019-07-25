@@ -45,7 +45,7 @@ public class ProgramResource {
 	 
 	  		@SuppressWarnings({ "rawtypes", "unchecked" })
 	  		@RequestMapping(method = RequestMethod.POST)
-	  		@PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  		@PreAuthorize("hasRole('R100') or hasRole('A2')")
 	  		@ApiOperation(value = "Create Program")
 	  		@ApiResponses(value = {//
 	        @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -73,7 +73,7 @@ public class ProgramResource {
 	    }
 	  		
 	  		  @DeleteMapping(value = "/{id}")
-	  		  @PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  		  @PreAuthorize("hasRole('R100') or hasRole('A2')")
 	  		  @ApiOperation(value = "Delete Program")
 	  		  @ApiResponses(value = {//
 	  		      @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -106,7 +106,7 @@ public class ProgramResource {
 	  	    // read - all
 
 	  	    @RequestMapping(method = RequestMethod.GET)
-	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  	    @PreAuthorize("hasRole('R100') or hasRole('A2')")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Programs")
 	  	    @ApiResponses(value = {//
@@ -132,7 +132,7 @@ public class ProgramResource {
 
 	  	    @RequestMapping(params = { "page", "size" }, method = RequestMethod.GET)
 	  	    @ResponseBody
-	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  	    @PreAuthorize("hasRole('R100') or hasRole('A2')")
 	  	    @ApiOperation(value = "Return all Programs (Paginated)")
 	  	    @ApiResponses(value = {//
 	  	    @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -149,7 +149,7 @@ public class ProgramResource {
 	  	    }
 	  	    
 	  	    @GetMapping("/pageable")
-	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  	    @PreAuthorize("hasRole('R100') or hasRole('A2')")
 	  	    @ResponseBody
 	  	    @ApiOperation(value = "Find all Programs (Paginated)")
 	  	    @ApiResponses(value = {//
@@ -169,7 +169,7 @@ public class ProgramResource {
 	  	    // write
 
 	  	  
-	  	    @PreAuthorize("hasRole('R1') or hasRole('A2')")
+	  	    @PreAuthorize("hasRole('R100') or hasRole('A2')")
 	  	    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	  	    @ResponseStatus(HttpStatus.OK)
 	  	    @ApiOperation(value = "Update Programs Paginated")

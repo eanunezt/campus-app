@@ -1,6 +1,7 @@
 package co.edu.itli.campus.register.model;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,6 +12,7 @@ import javax.persistence.Table;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -28,7 +30,8 @@ public class ContactoPrograma {
   private Long idPrograma;
   
   @LastModifiedDate
-  private Instant fecCambio;
+  @JsonFormat(pattern="yyyy-MM-dd")
+  private LocalDateTime  fecCambio;
   
   @ManyToOne
   @JoinColumn(name = "idContacto", updatable = false, insertable = false,
@@ -57,11 +60,11 @@ public void setIdPrograma(Long idPrograma) {
 	this.idPrograma = idPrograma;
 }
 
-public Instant getFecCambio() {
+public LocalDateTime getFecCambio() {
 	return fecCambio;
 }
 
-public void setFecCambio(Instant fecCambio) {
+public void setFecCambio(LocalDateTime fecCambio) {
 	this.fecCambio = fecCambio;
 }
 

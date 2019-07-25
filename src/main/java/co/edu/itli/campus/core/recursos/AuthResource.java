@@ -2,7 +2,7 @@ package co.edu.itli.campus.core.recursos;
 
 
 import java.net.URI;
-import java.util.Collections;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,28 +11,33 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import co.edu.itli.campus.core.dtos.ApiResponseDTO;
 import co.edu.itli.campus.core.dtos.JwtAuthenticationResponseDTO;
 import co.edu.itli.campus.core.dtos.RolDTO;
+import co.edu.itli.campus.core.dtos.SignInTO;
 import co.edu.itli.campus.core.dtos.UserDataDTO;
+import co.edu.itli.campus.core.model.EntidadAuditada;
 import co.edu.itli.campus.core.model.Rol;
 import co.edu.itli.campus.core.model.Usuario;
 import co.edu.itli.campus.core.respositorios.RolRepository;
 import co.edu.itli.campus.core.respositorios.UserRepository;
 import co.edu.itli.campus.core.seguridad.JwtTokenProvider;
-import co.edu.itli.campus.exception.AppException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -63,32 +68,39 @@ public class AuthResource {
     JwtTokenProvider tokenProvider;
     
     @PostMapping("/signin")
-    @ApiOperation(value = "${UserController.signin}")
+    @ApiOperation(value = "${UserController.signin}")   
     @ApiResponses(value = {//
         @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 422, message = "Invalid username/password supplied")})
+        @ApiResponse(code = 422, message = "Invalid username/password supplied"),
+        @ApiResponse(code = 401, message = "Invalid username/password supplied")})
     public ResponseEntity<JwtAuthenticationResponseDTO> login(//
-        @ApiParam("Username") @RequestParam String username, //
-        @ApiParam("Password") @RequestParam String password) {
+    		@Valid  @ApiParam("SignIn") @RequestBody SignInTO signin) {
   	  
+    	try {
   	  Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        username,
-                        password
+                		signin.getUsername(),
+                		signin.getPassword()
                 )
         );
+  	  SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+      String jwt = tokenProvider.generateToken(authentication);
+      return ResponseEntity.ok(new JwtAuthenticationResponseDTO(jwt));
+    	}catch(AuthenticationException e) {
+    		
+    		throw new BadCredentialsException("Usuario o Password Incorrectos.");
+    		
+    	}
 
-        String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponseDTO(jwt));
+      
     }
     
     
     
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
-  @PostMapping("/signup")
+    @PostMapping("/signup")
     @ApiOperation(value = "${UserController.signup}")
     @ApiResponses(value = {//
         @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -116,17 +128,21 @@ public class AuthResource {
         
         List<RolDTO>  rols=signUpRequest.getRoles();
         
-     for (Iterator iterator = rols.iterator(); iterator.hasNext();) {
+     /*for (Iterator iterator = rols.iterator(); iterator.hasNext();) {
 		RolDTO rolDTO = (RolDTO) iterator.next();
 		user.addRol(new Rol(rolDTO.getId()));
 		
-	}
-        
+	}*/
+        //TODO USUARIO RESULTA SER INVITADO
+        user.addRol(new Rol(2L));
 
        /* Rol userRole = roleRepository.findById(id)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRoles(Collections.singleton(userRole));*/
+		user.setFecCambio(Instant.now());
+		user.setIdUsuarioCambio(2l);
+		user.setFecRegistro(Instant.now());
 
         Usuario result = userRepository.save(user);
 
@@ -135,6 +151,60 @@ public class AuthResource {
                 .buildAndExpand(result.getUsuario()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponseDTO(true, "User registered successfully"));
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @PostMapping("/update")
+    @PreAuthorize("hasRole('R1')")
+    @ApiOperation(value = "Update data User")
+    @ApiResponses(value = {//
+        @ApiResponse(code = 400, message = "Something went wrong"), //
+        @ApiResponse(code = 403, message = "Access denied"), //
+        @ApiResponse(code = 422, message = "Username is already in use"), //
+        @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+    public ResponseEntity<ApiResponseDTO> updateUser(@Valid @ApiParam("Signup User") @RequestBody UserDataDTO signUpRequest) {
+        
+    	Usuario user =null;
+
+    	try {
+    	user = userRepository.findByUsuarioOrEmail(signUpRequest.getUsername(),signUpRequest.getEmail())
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with username or email : " + signUpRequest.getUsername())
+        );
+    	
+    	}catch (UsernameNotFoundException e) {
+    		 return new ResponseEntity(new ApiResponseDTO(false, e.getMessage()),
+                     HttpStatus.BAD_REQUEST);
+		}
+    	
+    	
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        signUpRequest.setPassword(null); 
+        
+        List<RolDTO>  rols=signUpRequest.getRoles();
+        
+     for (Iterator iterator = rols.iterator(); iterator.hasNext();) {
+		RolDTO rolDTO = (RolDTO) iterator.next();
+		user.addRol(new Rol(rolDTO.getId()));
+		
+	}
+      
+
+       /* Rol userRole = roleRepository.findById(id)
+                .orElseThrow(() -> new AppException("User Role not set."));
+
+        user.setRoles(Collections.singleton(userRole));*/
+		user.setFecCambio(Instant.now());
+		user.setIdUsuarioCambio(2l);
+		user.setFecRegistro(Instant.now());
+
+        Usuario result = userRepository.save(user);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/users/{username}")
+                .buildAndExpand(result.getUsuario()).toUri();
+
+        return ResponseEntity.created(location).body(new ApiResponseDTO(true, "User Update."));
     }
     
 

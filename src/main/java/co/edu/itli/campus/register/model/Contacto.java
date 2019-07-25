@@ -65,12 +65,16 @@ public class Contacto extends EntidadAuditada {
     @ApiModelProperty(position = 5)
     private String direccion;
     
-    @Column(length = 60)
+    @Column(length = 200)
     @ApiModelProperty(position = 6)
     private String observaciones;
     
-    
+    @Column(length = 100)
     @ApiModelProperty(position = 7)
+    private String urlAvatar;
+    
+    
+    @ApiModelProperty(position = 8)
     @Enumerated(EnumType.ORDINAL)
     private Estado estado;
    
